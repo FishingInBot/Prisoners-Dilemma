@@ -11,5 +11,5 @@ def PD_murry_random(myHist, oppHist):
     return choice()
 
 if __name__ == "__main__":
-    sys.stderr.write("ERROR - algo_mdo_equalizerC.py is not intended to be run stand-alone\n")
+    sys.stderr.write("ERROR - this is not intended to be run stand-alone\n")
     exit(-1)
