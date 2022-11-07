@@ -6,10 +6,10 @@ Outline game with numbers, Standard PD with unknown runs. I want about 250 min r
 Game will be scored with the following table:
 C = cooperate, D = Defect
 
-    C    D
-C  3,3 | 5,0
-   ----+----    
-D  0,5 | 1,1
+|     |  C  |  D  |
+|:---:|:---:|:---:|  
+|  C  | 3,3 | 5,0 |   
+|  D  | 0,5 | 1,1 |
 
 After each game, your total score will be divised by the rounds played to determine an average per round. These will 
 then be averaged again to determine how you did vs the average opponent.
