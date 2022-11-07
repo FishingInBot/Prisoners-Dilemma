@@ -1,9 +1,8 @@
 """ 
-This is my attempt to read all python files in a the folder this runs in and use them to compete with eachother round robin style
-in the prisoner's dillema problem.
+This is my attempt to read all python files in a the folder this runs in and use them to compete with eachother round 
+robin style in the prisoner's dillema problem.
 
-Outline game with numbers, Standard PD with unknown end. I want about 200 min runs with an average of 250 and max 300.
-IE: 200+(1..100) rounded down.
+Outline game with numbers, Standard PD with unknown runs. I want about 250 min runs with an average of 300 and max 350.
 Game will be scored with the following table:
 C = cooperate, D = Defect
 
@@ -11,6 +10,9 @@ C = cooperate, D = Defect
 C  3,3 | 5,0
    ----+----    
 D  0,5 | 1,1
+
+After each game, your total score will be divised by the rounds played to determine an average per round. These will 
+then be averaged again to determine how you did vs the average opponent.
 
 AKA mutual cooperation will net 3 points each, defection against cooperation will give the defector 5 points and 
 the cooperator nothing, while double defect will net a single point each.
@@ -20,16 +22,16 @@ always defect. This is because no matter what your opponent does, you get more p
 This shifts when we want to maximize points over many attempts as a mutual agreement will gain more than mutual 
 defection (gaining 3 points/round vs 1). 
 
+USAGE NOTES:
+for a submitted file to be eligible, it simply needs to match the naming sceme "PD_lastName_strategyName.py"
+and contain a definition for a function with the same name as the file (ie: "def PD_lastName_strategyName:")
+followed by your strategy. See PD_murry files for examples on formatting and definitions. After submitting your 
+strategy, it will be public and people may possibly extract a strategy to beat yours so be weary.
+
 Things to do: TODO
-   Track matchups and ensure we are playing round robin correctly,
    Output matches and point values to text files to verify,
-   Determine winning strategy and make changes from there,
    Put in some standard strategies to make mock data,
-
-   
-    Ideas: How to store score for unknown number of files at launch?
-                Make a map and loop in keys with the name of files, update map values with score after each game...?
-
+   Update documentation to make it clear what each 'player' needs.
 """
 
 import importlib
@@ -37,13 +39,10 @@ import random
 import os
 import pathlib
 
-
-numGames = 2
-minRounds = 100
-maxRounds = 300
-
-
-
+#adjustable "constants"
+numGames = 5
+minRounds = 250
+maxRounds = 350
 
 def p1Choice(past):
     if (random.randint(0,1) == 1):
