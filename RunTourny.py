@@ -21,11 +21,7 @@ This shifts when we want to maximize points over many attempts as a mutual agree
 defection (gaining 3 points/round vs 1). 
 
 Things to do: TODO
-   Make a quick and dirty copy that plays against input.
-   Track points for each entry (aka file in folder),
    Track matchups and ensure we are playing round robin correctly,
-   Compare selections angd give points,
-   return previous selections from opponent to both competitors (so they can adapt their strategy)
    Output matches and point values to text files to verify,
    Determine winning strategy and make changes from there,
    Put in some standard strategies to make mock data,
@@ -39,9 +35,7 @@ Things to do: TODO
 import random
 import os
 
-#This will keep track of game wins, though only useful in determining 1-on-1 fights.
-p1Games = 0
-p2Games = 0
+
 
 def p1Choice(past):
     if (random.randint(0,1) == 1):
@@ -57,27 +51,32 @@ def p2Choice(past):
         return past[-1]
 
 def findContestants():
-    entries = os.scandir(path = "C:/Users/14143/Documents/PD ThIng")
+    entries = os.listdir(path = "C:/Users/14143/Documents/PD ThIng")
+    for entry in entries:
+        if entry == f"PD_*":
+            print(entry)
 
 
 #currently set to run 50 games.
-def main():
+def playGame():
     for int in range(1,50):
+        # This will keep track of game wins, though only useful in determining 1-on-1 fights.
+        p1Games = 0
+        p2Games = 0
 
-        """
-        Here we are keeping score for the two players, the grids will store their selections on each pass.
-        """
+        
+        # Here we are keeping score for the two players, the grids will store their selections on each pass.
         player1Score = 0
         player2Score = 0
 
-        #roundMax = total rounds on each pass, currentRound is current round 
+        # RoundMax = total rounds on each pass, currentRound is current round 
         roundMax = random.randint(200,300)
         currentRound = 0
 
         playerOneGrid = []
         playerTwoGrid = []
 
-        #lets us know how many passes are going, but never tells the players.
+        # Lets us know how many passes are going, but never tells the players.
         print(f"{roundMax} runs going....") 
 
         """
@@ -93,13 +92,13 @@ def main():
                 player1Choice = p1Choice(playerTwoGrid[-currentRound:])
                 player2Choice = p2Choice(playerOneGrid[-currentRound:])
 
-            #If someone gives me bad inputs I will have to filter to C by default because that is most benificial to opponent. So if not 'D', will be 'C' by force...
+            # If someone gives me bad inputs I will have to filter to C by default because that is most benificial to opponent. So if not 'D', will be 'C' by force...
             if player1Choice != 'D':
                 player1Choice = 'C'
             if player2Choice != 'D':
                 player2Choice = 'C'
 
-            #Scoring updates
+            # Scoring updates
             if player1Choice == 'C' and player2Choice == 'C':
                 player1Score += 3
                 player2Score += 3
@@ -111,7 +110,7 @@ def main():
                 player1Score += 1
                 player2Score += 1
 
-            #deduct currentRound and update grids.
+            # Deduct currentRound and update grids.
             currentRound += 1
             playerOneGrid.append(player1Choice)
             playerTwoGrid.append(player2Choice)
@@ -125,11 +124,18 @@ def main():
         elif player2Score > player1Score:
             p2Games += 1
         
-        #print() #TODO get this implemented for pass when you update file calls.
+        # print() #TODO get this implemented for pass when you update file calls.
 
     print(f"{p1Games} for player 1, {p2Games} for player 2. {100-(p2Games+p1Games)} were a draw.")
 
-#standard funny thing...
+def main():
+    contestants = []
+    entries = os.listdir(path = "C:/Users/14143/Documents/PD ThIng")
+    for entry in entries:
+        if entry.startswith('PD_'):
+            contestants.append(entry.split("_"))
+    print(contestants)
+
+# Standard funny thing...
 if __name__ == "__main__":
     main()
-
