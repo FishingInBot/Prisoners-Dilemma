@@ -32,8 +32,16 @@ Things to do: TODO
 
 """
 
+import importlib
 import random
 import os
+import pathlib
+
+
+numGames = 2
+minRounds = 100
+maxRounds = 300
+
 
 
 
@@ -56,41 +64,55 @@ def findContestants():
         if entry == f"PD_*":
             print(entry)
 
+def get_algos(path = pathlib.Path(__file__).parent.resolve()):
+    flist = sorted(os.listdir(path))
+    algoList = []
+    for fname in flist:
+        if (fname.startswith("PD_")) and fname[-len(".py") == ".py"]:
+            algoList.append(fname[:-len(".py")])
+    algoFunc = []
+    algoScores = []
+    for algo in algoList:
+        algoFunc.append(getattr(importlib.import_module(algo), algo))
+        algoScores.append([])
+    return algoList, algoFunc, algoScores
 
-#currently set to run 50 games.
-def playGame():
-    for int in range(1,50):
-        # This will keep track of game wins, though only useful in determining 1-on-1 fights.
-        p1Games = 0
-        p2Games = 0
-
-        
+#currently set to run {numGames} games.
+def playGame(p1Fun, p2Fun):
+    # This will keep track of game wins, though only useful in determining 1-on-1 fights.
+    p1Games = 0
+    p2Games = 0
+    p1Score = []
+    p2Score = []
+    for int in range(1,numGames+1):
         # Here we are keeping score for the two players, the grids will store their selections on each pass.
         player1Score = 0
         player2Score = 0
 
-        # RoundMax = total rounds on each pass, currentRound is current round 
-        roundMax = random.randint(200,300)
+        # rounds = total rounds on each pass, currentRound is current round 
+        rounds = random.randint(minRounds,maxRounds)
         currentRound = 0
 
+        #player choice history
         playerOneGrid = []
         playerTwoGrid = []
 
         # Lets us know how many passes are going, but never tells the players.
-        print(f"{roundMax} runs going....") 
+        print(f"{rounds} runs going....") 
 
         """
         Here we are taking imput from the contestants.
         Need to convert this to file calls for other .py files in folder.
         """
-        while currentRound < roundMax:
+        while currentRound < rounds:
 
+            #Call competing functions given up to the last 5 choices from each player. This is all the data they can use for their functions.
             if currentRound>= 5:
-                player1Choice = p1Choice(playerTwoGrid[-5:])
-                player2Choice = p2Choice(playerOneGrid[-5:])
+                player1Choice = p1Fun(playerOneGrid[-5:],playerTwoGrid[-5:])
+                player2Choice = p2Fun(playerTwoGrid[-5:],playerOneGrid[-5:])
             else:
-                player1Choice = p1Choice(playerTwoGrid[-currentRound:])
-                player2Choice = p2Choice(playerOneGrid[-currentRound:])
+                player1Choice = p1Fun(playerOneGrid[-currentRound:],playerTwoGrid[-currentRound:])
+                player2Choice = p2Fun(playerTwoGrid[-currentRound:],playerOneGrid[-currentRound:])
 
             # If someone gives me bad inputs I will have to filter to C by default because that is most benificial to opponent. So if not 'D', will be 'C' by force...
             if player1Choice != 'D':
@@ -115,26 +137,38 @@ def playGame():
             playerOneGrid.append(player1Choice)
             playerTwoGrid.append(player2Choice)
 
-
-        print(f"At the end: \n{player1Score} is player 1's score,\n{player2Score} is player 2's score.\nChoices were as follows:\n")
-        print(playerOneGrid)
-        print (playerTwoGrid)
         if player1Score > player2Score:
             p1Games += 1
         elif player2Score > player1Score:
             p2Games += 1
-        
-        # print() #TODO get this implemented for pass when you update file calls.
 
-    print(f"{p1Games} for player 1, {p2Games} for player 2. {100-(p2Games+p1Games)} were a draw.")
+        p1Score.append(player1Score/rounds)
+        p2Score.append(player2Score/rounds)
+
+        print(f"At the end: \n{player1Score/rounds}/round is player 1's score,\n{player2Score/rounds}/round is player 2's score.\nChoices were as follows:\n")
+        print(playerOneGrid)
+        print (playerTwoGrid)
+
+    print(f"{p1Games} for player 1, {p2Games} for player 2. {numGames-(p2Games+p1Games)} were a draw.")
+    return p1Score, p2Score
 
 def main():
-    contestants = []
-    entries = os.listdir(path = "C:/Users/14143/Documents/PD ThIng")
-    for entry in entries:
-        if entry.startswith('PD_'):
-            contestants.append(entry.split("_"))
-    print(contestants)
+    algolist, algoFunc, algoScores = get_algos()
+    print(f"algolist = {algolist}, algoFunc =  {algoFunc}")
+    for index1 in range(len(algolist)):
+        for index2 in range(index1+1,len(algolist)):
+            p1Score, p2Score = playGame(algoFunc[index1], algoFunc[index2])
+            for score in p1Score:
+                algoScores[index1].append(score)
+            for score in p2Score:
+                algoScores[index2].append(score)
+    finalScore = []
+    for list in algoScores:
+        sum = 0
+        for score in list:
+            sum += score
+        finalScore.append(sum/len(list))
+    print(f"{max(finalScore)} from {algolist[finalScore.index(max(finalScore))]}")
 
 # Standard funny thing...
 if __name__ == "__main__":

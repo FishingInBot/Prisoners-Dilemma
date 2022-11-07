@@ -1,13 +1,14 @@
 import sys
+import random
 
-def choice(past):
-    if past == []:
+def choice():
+    if (random.randint(0,1) == 1):
         return 'C'
     else:
-        return past[-1]
+        return 'D'
 
-def PD_murry_titForTat(myHist, oppHist):
-    return choice(oppHist)
+def PD_murry_random(myHist, oppHist):
+    return choice()
 
 if __name__ == "__main__":
     sys.stderr.write("ERROR - algo_mdo_equalizerC.py is not intended to be run stand-alone\n")
