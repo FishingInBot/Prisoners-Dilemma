@@ -1,7 +1,6 @@
 """ 
 Things to do: TODO
    Output matches and point values to text files to verify,
-   Put in some standard strategies to make mock data,
    Update documentation to make it clear what each 'player' needs.
 """
 
@@ -11,16 +10,18 @@ import os
 import pathlib
 
 #adjustable "constants"
-numGames = 5
+numGames = 1
 minRounds = 250
 maxRounds = 350
 historyLimit = 20
+ccPoints = 3
+dcPoints = 5
 
 def get_algos(path = pathlib.Path(__file__).parent.resolve()):
     flist = sorted(os.listdir(path))
     algoList = []
     for fname in flist:
-        if (fname.startswith("PD_")) and fname[-len(".py") == ".py"]:
+        if (fname.startswith("PD_")) and fname.endswith(".py"):
             algoList.append(fname[:-len(".py")])
     algoFunc = []
     algoScores = []
@@ -61,11 +62,11 @@ def playGame(p1Fun, p2Fun):
 
             #Call competing functions given up to the last {historyLimit} choices from each player. This is all the data they can use for their functions.
             if currentRound>= historyLimit:
-                player1Choice = p1Fun(playerOneGrid[-historyLimit:],playerTwoGrid[-historyLimit:], p1Score, p2Score)
-                player2Choice = p2Fun(playerTwoGrid[-historyLimit:],playerOneGrid[-historyLimit:], p1Score, p2Score)
+                player1Choice = p1Fun(playerOneGrid[-historyLimit:],playerTwoGrid[-historyLimit:], player1Score, player2Score)
+                player2Choice = p2Fun(playerTwoGrid[-historyLimit:],playerOneGrid[-historyLimit:], player2Score, player1Score)
             else:
-                player1Choice = p1Fun(playerOneGrid[-currentRound:],playerTwoGrid[-currentRound:], p1Score, p2Score)
-                player2Choice = p2Fun(playerTwoGrid[-currentRound:],playerOneGrid[-currentRound:], p1Score, p2Score)
+                player1Choice = p1Fun(playerOneGrid[-currentRound:],playerTwoGrid[-currentRound:], player1Score, player2Score)
+                player2Choice = p2Fun(playerTwoGrid[-currentRound:],playerOneGrid[-currentRound:], player2Score, player1Score)
 
             # If someone gives me bad inputs I will have to filter to C by default because that is most benificial to opponent. So if not 'D', will be 'C' by force...
             if player1Choice != 'D':
