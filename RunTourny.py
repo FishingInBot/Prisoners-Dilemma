@@ -1,33 +1,4 @@
 """ 
-This is my attempt to read all python files in a the folder this runs in and use them to compete with eachother round 
-robin style in the prisoner's dillema problem.
-
-Outline game with numbers, Standard PD with unknown runs. I want about 250 min runs with an average of 300 and max 350.
-Game will be scored with the following table:
-C = cooperate, D = Defect
-
-    C    D
-C  3,3 | 5,0
-   ----+----    
-D  0,5 | 1,1
-
-After each game, your total score will be divised by the rounds played to determine an average per round. These will 
-then be averaged again to determine how you did vs the average opponent.
-
-AKA mutual cooperation will net 3 points each, defection against cooperation will give the defector 5 points and 
-the cooperator nothing, while double defect will net a single point each.
-
-The fun of this game is acknowledging the seeming paradox that GTO play on a single iteration of this game is to
-always defect. This is because no matter what your opponent does, you get more points defecting that cooperating.
-This shifts when we want to maximize points over many attempts as a mutual agreement will gain more than mutual 
-defection (gaining 3 points/round vs 1). 
-
-USAGE NOTES:
-for a submitted file to be eligible, it simply needs to match the naming sceme "PD_lastName_strategyName.py"
-and contain a definition for a function with the same name as the file (ie: "def PD_lastName_strategyName:")
-followed by your strategy. See PD_murry files for examples on formatting and definitions. After submitting your 
-strategy, it will be public and people may possibly extract a strategy to beat yours so be weary.
-
 Things to do: TODO
    Output matches and point values to text files to verify,
    Put in some standard strategies to make mock data,
@@ -43,25 +14,7 @@ import pathlib
 numGames = 5
 minRounds = 250
 maxRounds = 350
-
-def p1Choice(past):
-    if (random.randint(0,1) == 1):
-        return 'C'
-    else:
-        return 'D'
-
-
-def p2Choice(past):
-    if past == []:
-        return 'C'
-    else:
-        return past[-1]
-
-def findContestants():
-    entries = os.listdir(path = "C:/Users/14143/Documents/PD ThIng")
-    for entry in entries:
-        if entry == f"PD_*":
-            print(entry)
+historyLimit = 20
 
 def get_algos(path = pathlib.Path(__file__).parent.resolve()):
     flist = sorted(os.listdir(path))
@@ -72,6 +25,7 @@ def get_algos(path = pathlib.Path(__file__).parent.resolve()):
     algoFunc = []
     algoScores = []
     for algo in algoList:
+        print(algo)
         algoFunc.append(getattr(importlib.import_module(algo), algo))
         algoScores.append([])
     return algoList, algoFunc, algoScores
@@ -105,13 +59,13 @@ def playGame(p1Fun, p2Fun):
         """
         while currentRound < rounds:
 
-            #Call competing functions given up to the last 5 choices from each player. This is all the data they can use for their functions.
-            if currentRound>= 5:
-                player1Choice = p1Fun(playerOneGrid[-5:],playerTwoGrid[-5:])
-                player2Choice = p2Fun(playerTwoGrid[-5:],playerOneGrid[-5:])
+            #Call competing functions given up to the last {historyLimit} choices from each player. This is all the data they can use for their functions.
+            if currentRound>= historyLimit:
+                player1Choice = p1Fun(playerOneGrid[-historyLimit:],playerTwoGrid[-historyLimit:], p1Score, p2Score)
+                player2Choice = p2Fun(playerTwoGrid[-historyLimit:],playerOneGrid[-historyLimit:], p1Score, p2Score)
             else:
-                player1Choice = p1Fun(playerOneGrid[-currentRound:],playerTwoGrid[-currentRound:])
-                player2Choice = p2Fun(playerTwoGrid[-currentRound:],playerOneGrid[-currentRound:])
+                player1Choice = p1Fun(playerOneGrid[-currentRound:],playerTwoGrid[-currentRound:], p1Score, p2Score)
+                player2Choice = p2Fun(playerTwoGrid[-currentRound:],playerOneGrid[-currentRound:], p1Score, p2Score)
 
             # If someone gives me bad inputs I will have to filter to C by default because that is most benificial to opponent. So if not 'D', will be 'C' by force...
             if player1Choice != 'D':
@@ -161,13 +115,19 @@ def main():
                 algoScores[index1].append(score)
             for score in p2Score:
                 algoScores[index2].append(score)
+            print(f"Above was a game from {algolist[index1]} and {algolist[index2]}")
     finalScore = []
     for list in algoScores:
         sum = 0
         for score in list:
             sum += score
         finalScore.append(sum/len(list))
-    print(f"{max(finalScore)} from {algolist[finalScore.index(max(finalScore))]}")
+    print(algolist, " ", finalScore)
+    while (algolist != []):
+        if len(algolist) == 1:
+            print(f"{finalScore.pop(0)} from {algolist.pop(0)}")
+        else:
+            print(f"{finalScore.pop(finalScore.index(max(finalScore)))} from {algolist.pop(finalScore.index(max(finalScore)))}")
 
 # Standard funny thing...
 if __name__ == "__main__":

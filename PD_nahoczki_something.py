@@ -1,6 +1,4 @@
 import sys
-import random
-
 
 def choice(history, oppHistory):
     if not history:
@@ -10,10 +8,8 @@ def choice(history, oppHistory):
     else:
         return oppHistory[-1]
 
-
-def PD_nahoczki_something(myHist, oppHist):
+def PD_nahoczki_something(myHist, oppHist, myScore, oppScore):
     return choice(myHist, oppHist)
-
 
 if __name__ == "__main__":
     sys.stderr.write("ERROR - this is not intended to be run stand-alone\n")
