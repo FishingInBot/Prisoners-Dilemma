@@ -91,6 +91,7 @@ def playGame(p1Fun, p2Fun):
             playerOneGrid.append(player1Choice)
             playerTwoGrid.append(player2Choice)
 
+        # At the end of the game, we will print the scores and the grids.
         if player1Score > player2Score:
             p1Games += 1
         elif player2Score > player1Score:
@@ -99,10 +100,12 @@ def playGame(p1Fun, p2Fun):
         p1Score.append(player1Score/rounds)
         p2Score.append(player2Score/rounds)
 
+        #print the results of the game.
         print(f"At the end: \n{player1Score/rounds}/round is player 1's score,\n{player2Score/rounds}/round is player 2's score.\nChoices were as follows:\n")
         print(playerOneGrid)
         print (playerTwoGrid)
 
+    #print out the number of games won by each player.
     print(f"{p1Games} for player 1, {p2Games} for player 2. {numGames-(p2Games+p1Games)} were a draw.")
     return p1Score, p2Score
 
